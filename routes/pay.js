@@ -1,10 +1,12 @@
 var express = require('express');
 var router = express.Router();
+//Require the paypal module and the configurations
 var paypal = require('paypal-rest-sdk');	
 require('../configure');
 
 router.get('/', function(req, res, next) {
 	
+	//create tge payment request
 	var create_payment_json = {
     "intent": "sale",
     "payer": {
@@ -32,14 +34,14 @@ router.get('/', function(req, res, next) {
 		}]
 	};
 
-
+	//call the payment create and handle the response
 	paypal.payment.create(create_payment_json, function (error, payment) {
 	    if (error) {
 	        throw error;
 	    } else {
-	        //console.log("Create Payment Response");
-	        	console.log(payment);
-	        //console.log(payment.links[1].href)
+        	console.log(payment);
+
+	        //redirect to the approval url
 	        res.redirect(payment.links[1].href);
 	        res.end;
 	    }
@@ -47,8 +49,10 @@ router.get('/', function(req, res, next) {
 
 });
 
+//handle the success and execute payment
 router.get('/success', function(req, res, next) {
 
+		//prepare executement
 		var execute_payment_json = {
 		    "payer_id": req.query.PayerID,
 		    "transactions": [{
@@ -61,6 +65,7 @@ router.get('/success', function(req, res, next) {
 
 		var paymentId = req.query.paymentId;
 
+		//execute payment
 		paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
 		    if (error) {
 		        console.log(error.response);
@@ -75,6 +80,7 @@ router.get('/success', function(req, res, next) {
 		});
 });
 
+//handle the cancelation
 router.get('/cancel', function(req, res, next){
 	var paypal_res_body = JSON.stringify(req.query);
 	res.render('response', { paypal_response: 'CANCEL', paypal_response_body: paypal_res_body});

@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+
+//Require the Pay router
 var pay = require('./routes/pay');
 
 var app = express();
@@ -24,6 +26,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+
+//use the Pay route to the /pay requests
 app.use('/pay', pay);
 app.use('/users', users);
 
